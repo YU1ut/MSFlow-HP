@@ -31,11 +31,14 @@
         <p class="sidebar-title">Contents</p>
       </div>
       <nav class="sidebar-menu">
+        <a class="sidebar-item" href="#abstract"><span class="sidebar-text"><span class="sidebar-label">Abstract</span></span></a>
         <a class="sidebar-item" href="#method"><span class="sidebar-text"><span class="sidebar-label">Method</span></span></a>
         <a class="sidebar-item" href="#motion-control"><span class="sidebar-text"><span class="sidebar-label">Spatial Control</span></span></a>
         <a class="sidebar-item" href="#text-to-motion"><span class="sidebar-text"><span class="sidebar-label">Text-to-Motion</span></span></a>
         <a class="sidebar-item" href="#representation-comparison"><span class="sidebar-text"><span class="sidebar-label">Representations</span></span></a>
         <a class="sidebar-item" href="#snapmogen"><span class="sidebar-text"><span class="sidebar-label">SnapMoGen</span></span></a>
+        <a class="sidebar-item" href="#BibTeX"><span class="sidebar-text"><span class="sidebar-label">BibTeX</span></span>
+        </a>
       </nav>
     </div>
   </div>
@@ -47,9 +50,52 @@
           <div class="columns is-centered">
             <div class="column has-text-centered">
               <h1 class="title is-2 publication-title">MotionSpaceFlow: Representation-Aware Flow Matching in Direct Motion Space</h1>
-              <h2 class="title is-size-4 publication-title">ICLR 2027 Submission</h2>
+              <h2 class="title is-size-4 publication-title">Preprint</h2>
               <div class="is-size-5 publication-authors">
-                <span class="author-block">Anonymous Authors</span>
+                <span class="author-block">
+                  <a href="https://yu1ut.com">Qing Yu</a>,
+                </span>
+                <span class="author-block">
+                  <a href="https://www.kfworks.com">Kent Fujiwara</a>
+                </span>
+              </div>
+
+              <div class="is-size-5 publication-authors">
+                <span class="author-block">LY Corporation, Tokyo, Japan</span>
+              </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <!-- PDF Link. -->
+                <span class="link-block">
+                  <a href="https://arxiv.org/pdf/2607.01743"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </span>
+                    <span>Paper</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="https://arxiv.org/abs/2607.01743"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                        <i class="ai ai-arxiv"></i>
+                    </span>
+                    <span>arXiv</span>
+                  </a>
+                </span>
+                <!-- Code Link. -->
+                <span class="link-block">
+                  <a href="https://github.com/YU1ut/InterCMDM"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                        <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code</span>
+                    </a>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -64,6 +110,21 @@
           <h2 class="subtitle has-text-centered">
             MotionSpaceFlow (MSFlow) generates full-resolution motion directly, <br>without a learned motion encoder or decoder.
           </h2>
+        </div>
+      </div>
+    </section>
+
+    <section id="abstract" class="section">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3">Abstract</h2>
+            <div class="content has-text-justified">
+              <p>
+                Recent advances in diffusion and flow models have substantially improved text-driven human motion generation. Yet most methods generate in low-dimensional, temporally downsampled latent spaces learned primarily for reconstruction, a bottleneck that can limit generation quality and preclude direct manipulation of individual frames and joints. We introduce MotionSpaceFlow (MSFlow), a representation-aware flow-matching framework that predicts clean motion directly in continuous motion space without a learned encoder or decoder. To account for the anisotropic structure of direct motion representations, we propose representation-aware noise scaling and show how the initial Gaussian source scale governs the covariance of intermediate probability-path marginals. We further introduce a Representation-Aware Multimodal Diffusion Transformer (RA-MMDiT), which jointly updates token-level language and full-resolution motion features through joint attention while adapting temporal information flow to the motion representation: causal attention for incremental features defined by frame-to-frame changes, and bidirectional attention for global features such as absolute joint coordinates. Across different datasets and motion representations, MSFlow achieves state-of-the-art text-to-motion performance. Its global representation variant additionally enables zero-shot, inference-time control over any joint or frame through projection sampling without control-conditioned training, delivering leading motion quality with exact constraint satisfaction.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -764,7 +825,33 @@
       </div>
     </section>
 
+    <section class="section" id="BibTeX">
+      <div class="container is-max-desktop content">
+        <h2 class="title">BibTeX</h2>
+        <pre><code>@article{yu2026msflow,
+  title={MotionSpaceFlow: Representation-Aware Flow Matching in Direct Motion Space},
+  author={Yu, Qing and Fujiwara, Kent},
+  journal={arXiv preprint arXiv:2607.01743},
+  year={2026}
+}</code></pre>
+      </div>
+    </section>
+
   </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              We express our gratitude to the authors of <a href="https://github.com/nerfies/nerfies.github.io" class="external-link">Nerfies</a> for generously open sourcing the template of this website.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
 
 </body>
 </html>
