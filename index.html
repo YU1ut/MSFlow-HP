@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="MotionSpaceFlow: Representation-Aware Flow Matching in Direct Motion Space">
+  <meta name="keywords" content="MSFlow, text-to-motion, flow matching, human motion generation, spatial control">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>MSFlow</title>
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script src="static/js/bulma-carousel.min.js"></script>
+  <script src="static/js/bulma-slider.min.js"></script>
+  <script defer src="static/js/index.js"></script>
+</head>
+
+<body class="sidebar-hidden">
+
+  <div id="sidebar" class="sidebar" role="navigation" aria-label="Primary">
+    <div class="sidebar-content">
+      <div class="sidebar-header">
+        <p class="sidebar-title">Contents</p>
+      </div>
+      <nav class="sidebar-menu">
+        <a class="sidebar-item" href="#method"><span class="sidebar-text"><span class="sidebar-label">Method</span></span></a>
+        <a class="sidebar-item" href="#motion-control"><span class="sidebar-text"><span class="sidebar-label">Spatial Control</span></span></a>
+        <a class="sidebar-item" href="#text-to-motion"><span class="sidebar-text"><span class="sidebar-label">Text-to-Motion</span></span></a>
+        <a class="sidebar-item" href="#representation-comparison"><span class="sidebar-text"><span class="sidebar-label">Representations</span></span></a>
+        <a class="sidebar-item" href="#snapmogen"><span class="sidebar-text"><span class="sidebar-label">SnapMoGen</span></span></a>
+      </nav>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <section class="hero publication-header">
+      <div class="hero-body">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered">
+            <div class="column has-text-centered">
+              <h1 class="title is-2 publication-title">MotionSpaceFlow: Representation-Aware Flow Matching in Direct Motion Space</h1>
+              <h2 class="title is-size-4 publication-title">ICLR 2027 Submission</h2>
+              <div class="is-size-5 publication-authors">
+                <span class="author-block">Anonymous Authors</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="hero teaser">
+      <div class="container is-max-desktop">
+        <div class="hero-body">
+          <img class="paper-figure" src="./assets/figures/overview.png" alt="Comparison of latent-space generation and direct motion-space generation">
+          <h2 class="subtitle has-text-centered">
+            MotionSpaceFlow (MSFlow) generates full-resolution motion directly, <br>without a learned motion encoder or decoder.
+          </h2>
+        </div>
+      </div>
+    </section>
+
+    <section id="method" class="section">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <h2 class="title is-3">Method</h2>
+        </div>
+        <div class="content">
+          <figure class="method-figure">
+            <img class="paper-figure" src="./assets/figures/framework.png" alt="MSFlow pipeline">
+          </figure>
+          <p>
+            MSFlow acts directly on full-resolution motion. A clean sequence in either incremental 263D features or global XYZ coordinates is interpolated with a scaled Gaussian source, and RA-MMDiT predicts the clean endpoint from the noised motion and token-level text. The temporal attention graph follows the representation: causal attention promotes forward-consistent dependencies for incremental features, while bidirectional attention provides the two-sided context needed by globally coupled absolute coordinates. Clean-endpoint predictions are converted into an ODE velocity for sampling. For XYZ motion, projection sampling can enforce any-joint, any-frame spatial constraints at inference without control-conditioned training.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="motion-control" class="hero is-light is-small">
+      <div class="hero-body">
+        <div class="container">
+          <div class="columns is-centered has-text-centered">
+            <div class="column is-four-fifths">
+              <h2 class="title is-3">Training-Free Spatial Control</h2>
+              <p class="subtitle">Any-joint, any-frame constraints introduced only at inference through projection sampling.</p>
+            </div>
+          </div>
+          <div class="demo-grid">
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 1</h3>
+                <span class="demo-tag">Zero-Shot Control</span>
+              </div>
+              <p class="demo-prompt">a person makes a high kick with the left leg</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (Controlled XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/motion_control/kick/kick_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 2</h3>
+                <span class="demo-tag">Zero-Shot Control</span>
+              </div>
+              <p class="demo-prompt">a person walks forward while raising their right arm</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (Controlled XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/motion_control/walk/walk_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 3</h3>
+                <span class="demo-tag">Zero-Shot Control</span>
+              </div>
+              <p class="demo-prompt">a person gets on their hands and knees and crawls forwards.</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (Controlled XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/motion_control/crawl_forward/crawl_forward_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 4</h3>
+                <span class="demo-tag">Zero-Shot Control</span>
+              </div>
+              <p class="demo-prompt">a person raises both hands into fists, turns sideways and punches out with their left hand, then lowers both hands.</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (Controlled XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/motion_control/punch_left/punch_left_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 5</h3>
+                <span class="demo-tag">Zero-Shot Control</span>
+              </div>
+              <p class="demo-prompt">a person does jumping jacks.</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (Controlled XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/motion_control/jumping_jacks/jumping_jacks_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 6</h3>
+                <span class="demo-tag">Zero-Shot Control</span>
+              </div>
+              <p class="demo-prompt">this person runs in a circle clockwise</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (Controlled XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/motion_control/run_circle/run_circle_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 7</h3>
+                <span class="demo-tag">Zero-Shot Control</span>
+              </div>
+              <p class="demo-prompt">a man performs a squat while lifting his arms to shoulder height and hands above his head.</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (Controlled XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/motion_control/squat_arms/squat_arms_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 8</h3>
+                <span class="demo-tag">Zero-Shot Control</span>
+              </div>
+              <p class="demo-prompt">a person bends forward in a bowing motion.</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (Controlled XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/motion_control/deep_bow/deep_bow_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 9</h3>
+                <span class="demo-tag">Zero-Shot Control</span>
+              </div>
+              <p class="demo-prompt">a person performing a clean cartwheel</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (Controlled XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/motion_control/cartwheel/cartwheel_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 10</h3>
+                <span class="demo-tag">Zero-Shot Control</span>
+              </div>
+              <p class="demo-prompt">a person leaps forward then stands straight.</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (Controlled XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/motion_control/jump_forward/jump_forward_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="text-to-motion" class="hero is-small">
+      <div class="hero-body">
+        <div class="container">
+          <div class="columns is-centered has-text-centered">
+            <div class="column is-four-fifths">
+              <h2 class="title is-3">Text-to-Motion Generation</h2>
+              <p class="subtitle">Qualitative HumanML3D comparisons with continuous-latent baselines.</p>
+            </div>
+          </div>
+          <div class="demo-grid">
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 1</h3>
+                <span class="demo-tag">100 Frames</span>
+              </div>
+              <p class="demo-prompt">a man performs a squat and raises both arms forward.</p>
+              <div class="video-comparison">
+                <div class="video-panel">
+                  <h4>SALAD</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+<source src="./assets/videos/text_to_motion/motion_01/salad_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel">
+                  <h4>ACMDM</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_01/acmdm_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (263D)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_01/msflow_263_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_01/raw_patch_xyz_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 2</h3>
+                <span class="demo-tag">148 Frames</span>
+              </div>
+              <p class="demo-prompt">a person seeming to be standing up reaching down with right hand seeming to be checking phone and placing it back down to pocket.</p>
+              <div class="video-comparison">
+                <div class="video-panel">
+                  <h4>SALAD</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_02/salad_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel">
+                  <h4>ACMDM</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_02/acmdm_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (263D)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_02/msflow_263_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_02/raw_patch_xyz_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 3</h3>
+                <span class="demo-tag">160 Frames</span>
+              </div>
+              <p class="demo-prompt">a person stands with legs shoulder-width apart, slightly bent at the knees, arms outstretched at shoulder height, lowers left arm for several seconds, then brings with arm back to shoulder height.</p>
+              <div class="video-comparison">
+                <div class="video-panel">
+                  <h4>SALAD</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_03/salad_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel">
+                  <h4>ACMDM</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_03/acmdm_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (263D)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_03/msflow_263_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_03/raw_patch_xyz_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 4</h3>
+                <span class="demo-tag">196 Frames</span>
+              </div>
+              <p class="demo-prompt">a person walks forward then turns around to the right and returns.</p>
+              <div class="video-comparison">
+                <div class="video-panel">
+                  <h4>SALAD</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_04/salad_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel">
+                  <h4>ACMDM</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_04/acmdm_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (263D)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_04/msflow_263_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_04/raw_patch_xyz_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 5</h3>
+                <span class="demo-tag">120 Frames</span>
+              </div>
+              <p class="demo-prompt">a person makes sideways steps to the right, and then to the left.</p>
+              <div class="video-comparison">
+                <div class="video-panel">
+                  <h4>SALAD</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_05/salad_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel">
+                  <h4>ACMDM</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_05/acmdm_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (263D)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_05/msflow_263_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_05/raw_patch_xyz_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 6</h3>
+                <span class="demo-tag">196 Frames</span>
+              </div>
+              <p class="demo-prompt">the person was laying  down and then they got up.</p>
+              <div class="video-comparison">
+                <div class="video-panel">
+                  <h4>SALAD</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_06/salad_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel">
+                  <h4>ACMDM</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_06/acmdm_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (263D)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_06/msflow_263_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/text_to_motion/motion_06/raw_patch_xyz_render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="representation-comparison" class="hero is-light is-small">
+      <div class="hero-body">
+        <div class="container">
+          <div class="columns is-centered has-text-centered">
+            <div class="column is-four-fifths">
+              <h2 class="title is-3">Representation Comparison</h2>
+              <p class="subtitle">Direct generation with causal incremental 263D features and bidirectional global XYZ coordinates.</p>
+            </div>
+          </div>
+          <div class="demo-grid">
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 1</h3>
+                <span class="demo-tag">HumanML3D</span>
+              </div>
+              <p class="demo-prompt">person appears to be dancing with another person while his right hand is on the person's back and their right hand is extended appears to be holding their parnter's extended hand</p>
+              <div class="video-comparison">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (263D)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_gallery/motion_01/263-d.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_gallery/motion_01/xyz.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 2</h3>
+                <span class="demo-tag">HumanML3D</span>
+              </div>
+              <p class="demo-prompt">a person standing up puts their hands together at clavicle height level, then performs a low velocity kick with their right leg one time.</p>
+              <div class="video-comparison">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (263D)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_gallery/motion_02/263-d.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_gallery/motion_02/xyz.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 3</h3>
+                <span class="demo-tag">HumanML3D</span>
+              </div>
+              <p class="demo-prompt">a person has his arms extended, brings them down and jogs on the spot before standing still</p>
+              <div class="video-comparison">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (263D)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_gallery/motion_03/263-d.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_gallery/motion_03/xyz.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 4</h3>
+                <span class="demo-tag">HumanML3D</span>
+              </div>
+              <p class="demo-prompt">a person at a standstill starts running, then stops.</p>
+              <div class="video-comparison">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (263D)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_gallery/motion_04/263-d.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_gallery/motion_04/xyz.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 5</h3>
+                <span class="demo-tag">HumanML3D</span>
+              </div>
+              <p class="demo-prompt">a person stands still for a moment, and then staggers forward.</p>
+              <div class="video-comparison">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (263D)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_gallery/motion_05/263-d.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_gallery/motion_05/xyz.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 6</h3>
+                <span class="demo-tag">HumanML3D</span>
+              </div>
+              <p class="demo-prompt">the man performed a tennis smash that won the match.</p>
+              <div class="video-comparison">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (263D)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_gallery/motion_06/263-d.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="video-panel is-ours">
+                  <h4>MSFlow (XYZ)</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_gallery/motion_06/xyz.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="snapmogen" class="hero is-small">
+      <div class="hero-body">
+        <div class="container">
+          <div class="columns is-centered has-text-centered">
+            <div class="column is-four-fifths">
+              <h2 class="title is-3">SnapMoGen Results</h2>
+              <p class="subtitle">MSFlow trained directly on the dataset's native 296D representation.</p>
+            </div>
+          </div>
+          <div class="demo-grid">
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 1</h3>
+                <span class="demo-tag">SnapMoGen 296D</span>
+              </div>
+              <p class="demo-prompt">The person steps forward with his hand bent near their chest and lowers it. Then bending their knees while stepping backward, raise their bent hands to the face, and then straighten.</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_snap_gallery/motion_01/render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 2</h3>
+                <span class="demo-tag">SnapMoGen 296D</span>
+              </div>
+              <p class="demo-prompt">A person raises forward his right hand and rotates his right wrist at shoulder level. Then he outrageously releases something from his right hand and lowers his arm.</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_snap_gallery/motion_02/render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 3</h3>
+                <span class="demo-tag">SnapMoGen 296D</span>
+              </div>
+              <p class="demo-prompt">The person imitates a zombie. They put their arms forward, tilt their body slightly downward, and walk wobbly forward, then wobbly step backward and level off while standing still.</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_snap_gallery/motion_03/render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 4</h3>
+                <span class="demo-tag">SnapMoGen 296D</span>
+              </div>
+              <p class="demo-prompt">The person stands in a neutral resting position, pursing their lips. Then they leisurely start running and hopping forward at a place, swinging their arms and looking around contentedly.</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_snap_gallery/motion_04/render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 5</h3>
+                <span class="demo-tag">SnapMoGen 296D</span>
+              </div>
+              <p class="demo-prompt">The person stands still and tilts his or her torso to the left. Then they straighten up by taking a step to the right and turning their head to the left.</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_snap_gallery/motion_05/render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 6</h3>
+                <span class="demo-tag">SnapMoGen 296D</span>
+              </div>
+              <p class="demo-prompt">The person stands straight and walks forward with a model-like gait.</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_snap_gallery/motion_06/render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 7</h3>
+                <span class="demo-tag">SnapMoGen 296D</span>
+              </div>
+              <p class="demo-prompt">The person stands upright and makes waves with their arms. They abruptly raise their right arm to shoulder height, lower their right arm, and simultaneously raise their left arm. Then they repeat the hand movements.</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_snap_gallery/motion_07/render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+
+            <article class="demo-card">
+              <div class="demo-card-header">
+                <h3 class="title is-5">Case 8</h3>
+                <span class="demo-tag">SnapMoGen 296D</span>
+              </div>
+              <p class="demo-prompt">The person stands up and turns to their right, raises and lowers their arms. The person then walks aggressively in a circle. The person then stops and raises their arms.</p>
+              <div class="video-comparison single-video">
+                <div class="video-panel is-ours">
+                  <h4>MSFlow</h4>
+                  <video autoplay controls muted loop playsinline preload="metadata">
+                    <source src="./assets/videos/t2m_snap_gallery/motion_08/render.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+</body>
+</html>
